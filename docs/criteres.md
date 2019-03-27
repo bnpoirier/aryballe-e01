@@ -1,68 +1,66 @@
-## Critères
+## CritÃ¨res
 
-### Autorité
-> Qui a autorité sur le projet (Une ou plusieurs organisations ou sociétés ? Qui maîtrise l'information ?)
+### AutoritÃ©
+> Qui a autoritÃ© sur le projet (Une ou plusieurs organisations ou sociÃ©tÃ©s ? Qui maÃ®trise l'information ?)
 
-Le client maîtrise l'information, il est capable d'aministrer les droits des utilisateurs et de diffuser ou non les cartes et annotations. L'information est maîtrisée par l'ensemble des personnes autorisées à y accéder, mais un adminisatrateur local à les droits d'administration.
+L'organisation cliente maÃ®trise l'information de bout en bout. Il supervise l'administration des droits des utilisateurs et de la diffusion ou non des cartes et des annotations. L'information est maÃ®trisÃ©e par l'ensemble des personnes autorisÃ©es Ã  y accÃ©der, mais chaque organisation Ã  un adminisatrateur local ayant les droits d'administration sur les informations et les utilisateurs.
 
 **Par exemple :**
-*Étape 1 :* Un laboratoire italien a besoin de mettre en place une plateforme de visualisation 3D et choisit notre solution. Cette plateforme serait accesible dans un premier temps seulement par les chercheurs italiens.
+*Ã‰tape 1 :* Un laboratoire italien a besoin de mettre en place une plateforme de visualisation 3D et choisit notre solution. Cette plateforme serait accesible dans un premier temps seulement par les chercheurs italiens.
 
-*Étape 2 :* Au moment de l'installation de la solution, l'administrateur definit les informations utilisateurs (login, mot de passe). Les utilisateurs pourront changer leur mot de passe par la suite.*
+*Ã‰tape 2 :* Au moment de l'installation de la solution, l'administrateur definit les informations utilisateurs (login, mot de passe). Les utilisateurs pourront changer leur mot de passe par la suite.*
 
-*Étape 3 :* Un chercheur **italien** dépose un fichier LIDAR : Ce fichier est stocké sur MINIO en `object storage` sur un serveur du pays (d'une machine universitaire ou chez un hébergeur national)*
+*Ã‰tape 3 :* Un chercheur **italien** dÃ©pose un fichier LIDAR : Ce fichier est stockÃ© sur MINIO en `object storage` sur un serveur du pays (d'une machine universitaire ou chez un hÃ©bergeur national)*
 
-*Étape 4 :* Un chercheur **italien** dépose une annotation : L'annotation est stocké sur un serveur CouchDB sur un serveur du pays (d'une machine universitaire ou chez un hébergeur national)*
+*Ã‰tape 4 :* Un chercheur **italien** dÃ©pose une annotation : L'annotation est stockÃ© sur un serveur CouchDB sur un serveur du pays (d'une machine universitaire ou chez un hÃ©bergeur national)*
 
-*Étape 5 :* Un laboratoire **français** sollicite un accès aux données italiennes : L'administrateur récupère les emails des chercheurs français et transmet les login et les mots de passe. Ainsi le chercheur **français** pourra déposer du contenu sur la plateforme (fichier LIDAR ou annotation) selon les droits définis par l'administrateur italien*
+*Ã‰tape 5 :* Un laboratoire **franÃ§ais** sollicite un accÃ¨s aux donnÃ©es italiennes : L'administrateur rÃ©cupÃ¨re les emails des chercheurs franÃ§ais et transmet les login et les mots de passe. Ainsi le chercheur **franÃ§ais** pourra dÃ©poser du contenu sur la plateforme (fichier LIDAR ou annotation) selon les droits dÃ©finis par l'administrateur italien*
 
 
-### Résilience
-> Tolérances aux pannes issues de bug, crash, comportement malicieux ou indisponibilité de services ?
+### RÃ©silience
+> TolÃ©rances aux pannes issues de bug, crash, comportement malicieux ou indisponibilitÃ© de services ?
 
-La base de données des annotations propose un système de journal de transaction qui permet d'avoir un historique des requêtes sous forme de logs.
+La base de donnÃ©es des annotations propose un systÃ¨me de journal de transaction qui permet d'avoir un historique des requÃªtes sous forme de logs.
 
-Notre application n'a pas besoin de "load balancing" l'exécution de l'application ne sera pas amené à faire face à de fortes charges.
+Notre application n'a pas besoin de "load balancing" l'exÃ©cution de l'application ne sera pas amenÃ© Ã  faire face Ã  de fortes charges.
 
-Pour limiter les transits de Points Clouds, nous avons décider de les stocker dans le navigateur. Ainsi les chercheurs localisés dans des zones à faibles connexion internet ne seront pas ou peu impactés par cette connexion.
+Pour limiter les transits de Points Clouds, nous avons dÃ©cider de les stocker dans le navigateur. Ainsi les chercheurs localisÃ©s dans des zones Ã  faibles connexion internet ne seront pas ou peu impactÃ©s par cette connexion.
 
         @TODO
         **Response :**
             - S'appuyer sur des backup historiques (sauvegarde 1j, 1 semaine, 1 mois ...)
-            - Système de log des transactions CouchDB
+            - SystÃ¨me de log des transactions CouchDB
             - Pas besoin de load balancer car il n'y aura pas beaucoup de visiteurs
-            - L'approche Microservice conduit à une décentralisation du risque technique
+            - L'approche Microservice conduit Ã  une dÃ©centralisation du risque technique
 
 
-### Evolutivité
-> Sous quelle forme le système va-t-il évoluer ?
+### EvolutivitÃ©
+> Sous quelle forme le systÃ¨me va-t-il Ã©voluer ?
 
-Le système se reposera sur plusieurs solutions libres. L'application sera découpée en microservices, ainsi chaque service sera isolé et plus facile à faire évoluer. Une modification d'un service ne provoquera aucun problème sur le fonctionnement de l'application s'il respecte les spécificité d'input et d'output.
+Le systÃ¨me se reposera sur plusieurs solutions libres. L'application sera dÃ©coupÃ©e en microservices, ainsi chaque service sera isolÃ© et plus facile Ã  faire Ã©voluer. Une modification d'un service ne provoquera aucun problÃ¨me sur le fonctionnement de l'application s'il respecte les spÃ©cificitÃ© d'input et d'output.
 
-Par exemple, un administrateur système pourrait choisir de placer le service Minio (ou un autre service) sur un serveur différent afin d'alléger son serveur web.
+Par exemple, un administrateur systÃ¨me pourrait choisir de placer le service Minio (ou un autre service) sur un serveur diffÃ©rent afin d'allÃ©ger son serveur web.
 
 
-### Répartition
-> Où l’information est elle située ?
+### RÃ©partition
+> OÃ¹ lâ€™information est elle situÃ©e ?
 
-Les différents types d'informations sont distribués et/ou répliqués sur plusieurs disques. Les données sont répliquées mais toutes les copies restent sur le même serveur. 
+Les diffÃ©rents types d'informations sont distribuÃ©s et/ou rÃ©pliquÃ©s sur plusieurs disques. Les donnÃ©es sont rÃ©pliquÃ©es mais toutes les copies restent sur le mÃªme serveur. 
 
-Mais il est cependant possible de configurer Minio de manière à ce que les fichiers soient hebergés sur plusieurs serveurs. De même pour CouchDB.
+Mais il est cependant possible de configurer Minio de maniÃ¨re Ã  ce que les fichiers soient hebergÃ©s sur plusieurs serveurs. De mÃªme pour CouchDB.
 
 
 ### Organisation
-> Les acteurs ont ils les moyens d’accéder à l’information ?
-* Open Source
-* Closed Source
+> Les acteurs ont ils les moyens dâ€™accÃ©der Ã  lâ€™information ?
 
-Les acteurs sont les maîtres de leur installation. Ils sont donc l'accès aux informations. Chaque organisation est maîtresse des informations qu'elle manipule, elle peut les administrer et elle est la seule à y avoir accès.
+Les acteurs sont les maÃ®tres de leur installation. Ils sont donc l'accÃ¨s aux informations. Chaque organisation est maÃ®tresse des informations qu'elle manipule, elle peut les administrer et elle est la seule Ã  y avoir accÃ¨s.
 
 @TODO
 
 ### Apprentissage
-> Quelle est la nature des compétences nécessaires ?
+> Quelle est la nature des compÃ©tences nÃ©cessaires ?
 
-Les compétences généralistes : 
+Les compÃ©tences gÃ©nÃ©ralistes : 
 - Installation de serveur
 - SQL/NoSQL
 - CouchDB / PouchDB
@@ -70,7 +68,7 @@ Les compétences généralistes :
 - Docker
 - NodeJS / ExpressJS
 
-Compétences spécifiques : 
+CompÃ©tences spÃ©cifiques : 
 - /
 @TODO
 
@@ -78,31 +76,31 @@ Compétences spécifiques :
 ### Prix
 > Combien et quand doit on payer ? pourquoi (logiciel, service)
 
-Le prix varie si vous hébergez vous-même l'application ou si vous déléguez l'hébergement à un prestataire informatique.
+Le prix varie si vous hÃ©bergez vous-mÃªme l'application ou si vous dÃ©lÃ©guez l'hÃ©bergement Ã  un prestataire informatique.
 
-**Dans le cas ou vous souhaiteriez déléguer l'hébergement à un prestataire.** Voici la grille tarifaire de DigitalOcean en envisageant une dépense minimum.
+**Dans le cas ou vous souhaiteriez dÃ©lÃ©guer l'hÃ©bergement Ã  un prestataire.** Voici la grille tarifaire de DigitalOcean en envisageant une dÃ©pense minimum.
 
-| Grille tarifaire pour un hébergement sur DigitalOcean | Coût / mois
+| Grille tarifaire pour un hÃ©bergement sur DigitalOcean | CoÃ»t / mois
 |-------------------------------------------------------|----------------
-| Hébergement web (avec accès SSH)                      | 5$/mois
-| Hébergement Object Storage                            | 15$/mois
+| HÃ©bergement web (avec accÃ¨s SSH)                      | 5$/mois
+| HÃ©bergement Object Storage                            | 15$/mois
 | Droplet Debian (CouchDB, PosgtreSQL, PotreeConverter) | 5$/mois
 |                                                       |
 | TOTAL                                                 | 15$/mois
 
-Voici les dépenses concernant la promotion et le développement de l'application Aryballe.
+Voici les dÃ©penses concernant la promotion et le dÃ©veloppement de l'application Aryballe.
 
-| Coûts de développement de l'application               | Coût / mois
+| CoÃ»ts de dÃ©veloppement de l'application               | CoÃ»t / mois
 |-------------------------------------------------------|----------------
-| Hébergement web (Site vitrine de promotion)                        | 5$/mois
-| Hébergement Object Storage (Distribution de l'application)| 15$/mois
-| Équipe produit (5 personnes à temps plein)            | 18250€/mois
+| HÃ©bergement web (Site vitrine de promotion)                        | 5$/mois
+| HÃ©bergement Object Storage (Distribution de l'application)| 15$/mois
+| Ã‰quipe produit (5 personnes Ã  temps plein)            | 18250â‚¬/mois
 |                                                       |
 | TOTAL                                                 | 18270$/mois
 
 
-### Dépendance
-Dépendances ponctuelles sans impact économique, le logiciel dépend de plusieurs projets open source : 
+### DÃ©pendance
+DÃ©pendances ponctuelles sans impact Ã©conomique, le logiciel dÃ©pend de plusieurs projets open source : 
     - CouchDB
     - PouchDB
     - Minio
@@ -112,58 +110,47 @@ Dépendances ponctuelles sans impact économique, le logiciel dépend de plusieurs 
     - Docker
 
 
-### Sécurité
-> Où se situe la sécurisation du système (cryptage) ?
+### SÃ©curitÃ©
+> OÃ¹ se situe la sÃ©curisation du systÃ¨me (cryptage) ?
     * Au repos (stockage)
-    * A l’échange (communication)
+    * A lâ€™Ã©change (communication)
 
-L'accès à la plateforme nécessite une clé USB sécurisé par le protocole U2F.
+L'accÃ¨s Ã  la plateforme nÃ©cessite une clÃ© USB sÃ©curisÃ© par le protocole U2F.
 
-Les données quant à elles, ne sont pas toutes chiffrées : Les annotations, qui représente la majorité des informations sensibles le sont.
+Les donnÃ©es quant Ã  elles, ne sont pas toutes chiffrÃ©es : Les annotations, qui reprÃ©sente la majoritÃ© des informations sensibles le sont.
 
-**Au repos** les annotations et les nuages de points sont stockés dans le navigateur de l'utilisateur en clair et sont chiffrées en base de données.
+**Au repos** les annotations et les nuages de points sont stockÃ©s dans le navigateur de l'utilisateur en clair et sont chiffrÃ©es en base de donnÃ©es.
 
-**À l'échange** les informations sont chiffrées par le serveur.
+**Ã€ l'Ã©change** les informations sont chiffrÃ©es par le serveur.
 
 
 ### Redondance
-> Comment l’information est-elle repliquée ?
+> Comment lâ€™information est-elle repliquÃ©e ?
 
-Les fichiers Potree (.bins) sont repliquées par Minio sur différents disques de même que les fichiers LIDAR si 4 disques sont installées sur la machine.
+Les fichiers Potree (.bins) sont repliquÃ©es par Minio sur diffÃ©rents disques de mÃªme que les fichiers LIDAR si 4 disques sont installÃ©es sur la machine.
 
-Si l'administrateur installe plusieurs instances Docker de CouchDB, il peut créer un cluster et de dupliquer les annotations sur ces différentes instances. Si une seule instance est créée, il n'y aura alors pas de réplication.
+Si l'administrateur installe plusieurs instances Docker de CouchDB, il peut crÃ©er un cluster et de dupliquer les annotations sur ces diffÃ©rentes instances. Si une seule instance est crÃ©Ã©e, il n'y aura alors pas de rÃ©plication.
 
 
-### Durée du projet
-> Dans quels termes la réalisation du projet s’inscrit elle ?
-    * Court terme
-    * Moyen terme
-    * Long terme
+### DurÃ©e du projet
+> Dans quels termes la rÃ©alisation du projet sâ€™inscrit elle ?
 
-Le projet s'inscrit à moyen terme.
+Le projet s'inscrit Ã  long terme. C'est un projet open source qui est conÃ§u pour durer et fonctionner sur le long terme.
+
 
 ### Interfaces
-> Quelles sont les modalités d’accès aux informations ?
-    * Format
-    * API
-    * Protocole
+> Quelles sont les modalitÃ©s dâ€™accÃ¨s aux informations ?
 
-Les données ne sont pas accessibles en mode déconnecté. Les fichiers statiques (.bin et LIDAR) peuvent être requêté par le biais de l'API de Minio mais requiert d'être authentifié.
+Les donnÃ©es ne sont pas accessibles en mode dÃ©connectÃ©. Les fichiers statiques (.bin et LIDAR) peuvent Ãªtre requÃªtÃ© par le biais de l'API de Minio mais requiert d'Ãªtre authentifiÃ©. Les .bin seront stockÃ©s en cacher pour un certain temps
 
-Les annotations sont récupérées par le serveur web au format JSON via l'API CouchDB
+Les annotations sont rÃ©cupÃ©rÃ©es par le serveur web au format JSON via l'API CouchDB et synchronisÃ© dans la base de donnÃ©e du navigateur grÃ¢ce Ã  PouchDB. Ainsi les donnÃ©es liÃ©es aux annotation seront toujours disponible.
 
-Les fichiers LIDAR et .bins sont récupérés dans leur format d'origine et retrouvés en requêtant le contrôleur Minio grâce au client JavaScript Minio qui communique avec le protocole s3 d'Amazon.
+Les fichiers LIDAR et .bins sont rÃ©cupÃ©rÃ©s dans leur format d'origine et retrouvÃ©s en requÃªtant le contrÃ´leur Minio grÃ¢ce au client JavaScript Minio qui communique avec le protocole s3 d'Amazon.
 
 
-### « Formes » de stockage
-> Sous quelle forme est stockée l’information ?
-    * Block, Fichier, Clef-Valeur
-    * Relationnelle, Orientée Ligne (SGBD), Orientée colonne
-    * Objet, Document, Graphe & Triple Store
-    * "Format" des données (JSON, csv)
-    * « Forme » des informations (tabulaire, graph, cubique)
-    * Portabilité des données ?
+### Â« Formes Â» de stockage
+> Sous quelle forme est stockÃ©e lâ€™information ?
 
-Les annotations sont stockées au format JSON sous la forme de documents
-Les données utilisateurs sont stockées dans une base de données orientée ligne PostgreSQL
-Les fichiers .bin et .las (LIDAR)sont stockés au format objet sur un serveur Minio.
+Les annotations sont stockÃ©es au format JSON sous la forme de documents
+Les donnÃ©es utilisateurs sont stockÃ©es dans une base de donnÃ©es orientÃ©e ligne PostgreSQL
+Les fichiers .bin et .las (LIDAR)sont stockÃ©s au format objet sur un serveur Minio.

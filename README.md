@@ -1,12 +1,12 @@
-# Aryballe - Equipe n°1
+# Aryballe - Equipe nÂ°1
 
-## Équipe :
-Antonin BLIN
-Charles PAULAS VICTOR
-Landry MONMENI
-Brendan POIRIER
+## Ã‰quipe :
+- Antonin BLIN
+- Charles PAULAS VICTOR
+- Landry MONMENI
+- Brendan POIRIER
 
 ## Documentation
-[Critères](docs/criteres.md)
-[Architecture](docs/architecture.md)
-[Schéma fonctionnel](docs/schema.pdf)
+- [Architecture](docs/architecture.md)
+- [CritÃ¨res](docs/criteres.md)
+- [SchÃ©ma fonctionnel](docs/schema.pdf)
