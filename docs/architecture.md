@@ -68,8 +68,9 @@ L'application utilise la technologie **WebGL**, assez récente qui n'est pas sup
 * Navigateur minimum requis : Chrome 9 / Firefox 4 / Internet Explorer 11
 
 Aperçu de la compatibilité de Potree : 
-| Browser       | OS       | Result | Comments     |
-| ---------     | -----    | ------ | --------     |
+
+| Browser | OS | Result | Comments |
+| ------------- | -------- | ------ | ------------ |
 | Chrome 64     | Win10	   | Works  |              |	
 | Firefox 58    | Win10    | Works  |              |	
 | Edge          | Win10    | Not supported |       |
