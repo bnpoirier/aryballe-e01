@@ -20,18 +20,11 @@ L'organisation cliente maîtrise l'information de bout en bout. Il supervise l'a
 ### Résilience
 > Tolérances aux pannes issues de bug, crash, comportement malicieux ou indisponibilité de services ?
 
-La base de données des annotations propose un système de journal de transaction qui permet d'avoir un historique des requêtes sous forme de logs.
+La résilience du projet est standard.
 
-Notre application n'a pas besoin de "load balancing" l'exécution de l'application ne sera pas amené à faire face à de fortes charges.
+La base de données des annotations (CouchDB) propose un système de journal de transaction qui permet d'avoir un historique des requêtes sous forme de logs.
 
-Pour limiter les transits de Points Clouds, nous avons décider de les stocker dans le navigateur. Ainsi les chercheurs localisés dans des zones à faibles connexion internet ne seront pas ou peu impactés par cette connexion.
-
-        @TODO
-        **Response :**
-            - S'appuyer sur des backup historiques (sauvegarde 1j, 1 semaine, 1 mois ...)
-            - Système de log des transactions CouchDB
-            - Pas besoin de load balancer car il n'y aura pas beaucoup de visiteurs
-            - L'approche Microservice conduit à une décentralisation du risque technique
+De la même manière, l'application web conçu en NodeJS / Express enregistrera dans un journal (fichiers logs), les erreurs et les exceptions survenues durant le fonctionnement de l'application.
 
 
 ### Evolutivité
@@ -50,27 +43,22 @@ Les différents types d'informations sont distribués et/ou répliqués sur plus
 Mais il est cependant possible de configurer Minio de manière à ce que les fichiers soient hebergés sur plusieurs serveurs. De même pour CouchDB.
 
 
-### Organisation
-> Les acteurs ont ils les moyens d’accéder à l’information ?
+### Transfert de technologie
+> Les acteurs ont ils les moyens d’accéder à l’information ? Open source ou Closed source ?
 
-Les acteurs sont les maîtres de leur installation. Ils sont donc l'accès aux informations. Chaque organisation est maîtresse des informations qu'elle manipule, elle peut les administrer et elle est la seule à y avoir accès.
+Nous souhaitons que les utilisateurs de notre solution soient maître de leurs installations. Ils faut donc que les administrateurs aient accès aux informations de façon transparente de la plateforme. Ainsi nous avons opté pour l'usage de technologie Open Source et nous avons choisi de soumettre notre solution à une licence GNU GPLv3. Ces choix permettent aux utilisateurs d'avoir une bonne visiblité de l'activité du système.
 
-@TODO
 
 ### Apprentissage
 > Quelle est la nature des compétences nécessaires ?
 
-Les compétences généralistes : 
+Les compétences : 
 - Installation de serveur
 - SQL/NoSQL
 - CouchDB / PouchDB
 - Minio
 - Docker
 - NodeJS / ExpressJS
-
-Compétences spécifiques : 
-- /
-@TODO
 
             
 ### Prix
@@ -85,18 +73,19 @@ Le prix varie si vous hébergez vous-même l'application ou si vous déléguez l
 | Hébergement web (avec accès SSH)                      | 5$/mois
 | Hébergement Object Storage                            | 15$/mois
 | Droplet Debian (CouchDB, PosgtreSQL, PotreeConverter) | 5$/mois
+| Support Aryballe (indépendant de l'hébergement)       | 100$/mois
 |                                                       |
-| TOTAL                                                 | 15$/mois
+| **TOTAL**                                             | **125$** /mois
 
 Voici les dépenses concernant la promotion et le développement de l'application Aryballe.
 
 | Coûts de développement de l'application               | Coût / mois
 |-------------------------------------------------------|----------------
-| Hébergement web (Site vitrine de promotion)                        | 5$/mois
+| Hébergement web (Site vitrine de promotion)           | 5$/mois
 | Hébergement Object Storage (Distribution de l'application)| 15$/mois
 | Équipe produit (5 personnes à temps plein)            | 18250€/mois
 |                                                       |
-| TOTAL                                                 | 18270$/mois
+| **TOTAL**                                             | **18270$** /mois
 
 
 ### Dépendance

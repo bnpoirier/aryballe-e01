@@ -1,7 +1,32 @@
 # ARYBALLE PROJECT : Proposition technique
 Par Brendan, Antonin, Charles, Landry
 
-[TOC]
+## Table des matières
+
+  * [Demande](#demande)
+  * [Approche](#approche)
+  * [Stack technologiques](#stack-technologiques)
+    + [Front End](#front-end)
+      - [VueJS](#vuejs)
+      - [Potree](#potree)
+    + [Back End](#back-end)
+    + [Bases de données](#bases-de-données)
+      - [Stockage Annotations : CouchDB](#stockage-annotations-:-couchdb)
+      - [Stockage des fichiers statiques : Minio](#stockage-des-fichiers-statiques-:-minio)
+      - [Stockage des données utilisateurs : PostgreSQL](#stockage-des-donn-es-utilisateurs-:-postgresql)
+  * [Infrastructure](#infrastructure)
+    + [Application conteneurisée](#application-conteneurisée)
+    + [Architecture de la solution](#architecture-de-la-solution)
+    + [Ressources](#ressources)
+    + [Installation](#installation)
+  * [Sécurité / Authentification](#sécurité-/-authentification)
+    + [Authentification par mot de passe](#authentification-par-mot-de-passe)
+    + [Authentification par clé USB (WebAuthn)](#authentification-par-clé-usb-(webauthn))
+  * [Perspectives](#perspectives)
+    + [Fonctionnalités en réflexion](#fonctionnalités-en-réflexion)
+    + [Maintenance évolutive](#maintenance-évolutive)
+  * [Licence](#licence)
+
 
 ## Demande
 Le CNRS demande à mettre en ligne une application web qui permettrait de visualiser des monuments historiques en 3 dimensions.
@@ -31,9 +56,10 @@ Par ailleurs, notre système suit les principes des `Microservices` qui morcelle
 
 ## Stack technologiques
 ### Front End
-#### AngularJS / VueJS
+####  VueJS
 L'application utilisera un framework appliquant une logique de "composants" qui permet d'améliorer la maintenabilité du projet sur la partie front. 
-Nous avons choisi VueJS étant realtivement simple et ayant une logique de DOM virtuel.
+
+Nous avons choisi **VueJS** nous paraissant plus simple à utiliser et ayant une logique de DOM virtuel.
 
 
 #### Potree
@@ -66,7 +92,11 @@ Nous avons besoin d'une base de données **NoSQL** notamment pour la flexibilit�
 #### Stockage des fichiers statiques : Minio
 Nous avons choisi un mode de stockage de type **Object Storage** pour les fichiers **Points Clouds** (Potree) et les fichiers **LIDAR**.
 
-Nous avons donc choisi de mettre en place plusieurs buckets dédiés aux fichiers Points Clouds et aux fichiers LIDAR sur une serveur **Minio**. Chaque buckets de données est répliqué sur une machine différente.
+Nous avons donc choisi de mettre en place plusieurs buckets sur un serveur **Minio** :
+- Un bucket pour les fichiers Points Clouds 
+- Un bucket pour les fichiers LIDAR
+
+Chaque bucket de données peut être répliqué sur une machine différente.
 
 Nous avons exclu les prestataires d'hébergement comme Amazon Web Services pour ne pas imposer de services payant et laisser le choix de l'hébergement des données aux organisations.
 
@@ -76,22 +106,25 @@ Afin de stocker les données utilisateurs, nous avons choisi d'utiliser **Postgr
 
 La base de données stockera 3 tables :
 
-- users
+- **Table : users**
     - userId
     - login
+    - password
     - public_key
-    - laboratoryId
-    - roleId
+    - *laboratoryId*
+    - *roleId*
 => Données utilisateur
 
-Le champ "public_key" contient la clé public de déchiffrage pour l'authentification du scientifique qui se fera par insertion d'une clé USB **FIDO U2F** lors de l'accès au site. En savoir plus sur le système de connexion, voir [Sécurité / Authentification](#securite-authentification)
+Le champ "password" est haché lors de l'inscription par l'application web par l'utilisation de l'algorithme de hashage SHA256.
 
-- roles
+Le champ "public_key" contient la clé public de déchiffrage pour l'authentification du scientifique qui se fera par insertion d'une clé USB **FIDO U2F** lors de l'accès au site. En savoir plus sur le système de connexion, voir [Sécurité / Authentification](#Sécurité--Authentification)
+
+- **Table : roles**
     - roleId
     - name
 => Données droits utilisateurs.
 
-- laboratory
+- **Table : laboratory**
     - laboratoryId
     - name
     - address
@@ -103,29 +136,36 @@ Le champ "public_key" contient la clé public de déchiffrage pour l'authentific
 
 ## Infrastructure
 
-### Hébergement sur GitHub
-La solution sera mis à disposition sur GitHub afin que le public puisse la télécharger et connaître la composition de la solution.
-
-2 dépôts seront crées :
-    - Dépôt **aryballe/aryballe** contiendra la solution
-    - Dépôt **aryballe/server** contiendra la solution NodeJS/Express
-
 ### Application conteneurisée
 Notre application suit une architecture microservices. L'application et chacun des services associés sont conteneurisés. Docker est donc nécéssaire pour faire fonctionner l'application.
 
 ### Architecture de la solution
+La partie back du projet est divisée en 5 blocs conteneurisés : 
+- **Bloc Minio :** Stockage de fichiers statiques (Lidar et Points Clouds) réplicable et distribuable. 
+- **Bloc PostgreSQL :** Stockage en base de données des informations pour les utilisateurs, il est réplicable et distribuable.
+- **Bloc CouchDB :** Stockage en base de données des annotations, il est réplicable et distribuable.
+- **Bloc Potree Converter :** Service de conversion de fichier Lidar
+- **Bloc Web Application :** Serveur de la web application
+<br/>
+**<center>Architeture des microservices du projet Aryballe</center>**
 
-**Bloc Minio :** Stockage de fichiers statiques (Lidar et Points Clouds)
-**Bloc PostgreSQL :** Stockage en base de données des informations pour les utilisateurs
-**Bloc CouchDB :** Stockage en base de données des annotations
-**Bloc Potree Converter :** Service de conversion de fichier Lidar
-**Bloc Web Application :** Serveur de la web application
+![](https://i.imgur.com/DEkZz0g.png)
 
-![](https://i.imgur.com/DmaoWW9.png)
+<br/>
 
-@TODO
+**Docker Compose** orchestre l'ensemble des conteneurs pour faire fonctionner le projet.
 
-### Configuration matériel minimale du serveur requise
+- **Traefik** permet de rendre accessible depuis l'éxterieur, les 2 services : Minio et l'application NodeJS / Express. Ces 2 services écoutant sur le port 443, seul un processus peut écouter sur un port. Il nous fallait un **proxy** qui nous permettrait d'écouter les requêtes passant par le port 443 et de router chaque requête au bon service.
+
+- Le **client web** exécute l'application, il va récupérer 2 types d'informations : 
+    - Les nuages de points de l'API S3 proposée par Minio, les nuages de points sont ensuite stockés dans le navigateurs via les services workers.
+    - Les annotations de CouchDB synchronisées grâce à PouchDB.
+
+- **Minio** Permet de sotcker des fichiers en format objet, il est divisé en plusieurs Buckets qui isolent les différents types de fichiers stockés, et facilite la réplication et distribution des données.
+
+- **Potree Converter** est un service de conversion de fichiers Lidar en fichiers Points Clouds. Grâce au système d'évenements de Minio, le convertisseur est au courant des changements sur le stockage. Il est donc capable de s'activer lors d'un ajout de fichier pour le traiter comme il faut.
+
+
 ### Ressources
 
 - Structure des ressources pour notre organisation : 
@@ -155,10 +195,10 @@ Notre application suit une architecture microservices. L'application et chacun d
         - Hébergement tiers accessible en SSH -> Digital Ocean
 
 ### Installation
-@TODO
 1. S'assurer d'avoir les ressources necessaires en terme de serveur et de disques durs
 2. Préparer les machines de réplications (pour Minio et CouchDB)
     - Installer des instances Minio / CouchDB
+    - Ajouter les accès des machines supplémentaires en variables d'environnement
 3. Pull le projet sur la machine principale
 4. Exécuter `docker-compose` pour orchestrer les différents conteneurs de la machine.
 
@@ -208,13 +248,23 @@ https://fidoalliance.org/how-fido-works/
     - Interface de choix des versions de cartes
     - Mettre à jour l'URL en fonction de l'angle de la caméra et de l'annotation sélectionnée pour faciliter la collaboration et le partage de lien
     - Interface de mise à disposition des cartes publiques
-- Mettre en place le RDF sous la forme d'un JSON-LD afin d'établir des relations sémantiques entre les annotations. Les objets annotation seront au préalable définis selon le formalisme RDF. Ainsi lors de l'ajout de nouveaux objets au fur et à mesure des découvertes sur les cartes, les annotations seront identifiables sur la carte par des parsers comme étant des objets ayant rôle particuliers. 
+- (Fonctionnalité au stade de recherche) Mettre en place le RDF au format d'un JSON-LD afin d'établir des relations sémantiques entre les annotations. Les objets annotation seront au préalable définis selon le formalisme RDF. Ainsi lors de l'ajout de nouveaux objets au fur et à mesure des découvertes sur les cartes, les annotations seront identifiables sur la carte par des parsers comme étant des objets ayant rôle particuliers. 
+Aussi sur plus long terme nous pourrions réaliser une cartographie d'annotations et donc d'éléments découverts dans les nuages de points.
 
-```json
-{
+Documentation : [Web annotation protocol](https://www.w3.org/TR/annotation-protocol/)
+
+```jsonld
+// Exemple d'objet annotation au format JSON-LD
+{ 
+    "body": {
+        "type": "TextualBody",
+        "value": "I like this page!"
+    },
+    "target": "http://www.example.com/index.html",
     "@context": "http://aryballe.org",
     "@type": "Annotation",
-    "id" : "344",
+    "id": "344",
+    "created": "2015-01-31T12:03:45Z",
     "position": {
         "@type": "3DCoordinates",
         "x": "40.75",
@@ -223,17 +273,21 @@ https://fidoalliance.org/how-fido-works/
     },
     "name": "Sphinx",
     "map_id": "378340",
-    "author" : {
+    "author": {
         "id": "3146574",
         "name": "Champollion"
+    },
+    "body": {
+        "type": "TextualBody",
+        "value": "Annotation content", // Annotation content
+        "target": "http://www.annotation.url/" // URL de l'annotation
     }
 }
 ```
 
 ### Maintenance évolutive
-Le projet sera amené à être amélioré via des mises à jours que nous rendrons disponibles au client. Nous ne pourrons pas, de part l'infrastructure technique et une question d'éthique forcer les mises à jour du logiciel chez les organismes. Le principe est donc de rendre disponible les nouvelles versions sur nos serveurs. L'instance du logiciel client fera une simple requête sur nos serveurs pour vérifier qu'il ait la dernière version, sinon l'utilisateur en sera informé via une notification sur l'interface du logiciel.
+Le projet sera amené à être amélioré via des mises à jours que nous rendrons disponibles au client. Nous ne pourrons pas, de part l'infrastructure technique et pour une question d'éthique, forcer les mises à jour du logiciel chez les organismes. Le principe est donc de rendre disponible les nouvelles versions sur nos serveurs. L'instance du logiciel client fera une simple requête sur nos serveurs pour vérifier qu'il ait la dernière version, sinon l'utilisateur en sera informé via une notification sur l'interface du logiciel.
 
 
 ## Licence
-
 Nous proposons d'appliquer la licence GNU GPLv3 car nous souhaitons que la communauté puisse proposer des améliorations ou modifications sur notre système. Néanmoins nous ne souhaitons pas qu'une personne physique ou morale reproduise notre solution et la propose en `closed source`.
